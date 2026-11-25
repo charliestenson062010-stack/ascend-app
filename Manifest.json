@@ -3,9 +3,17 @@
   "short_name": "ASCEND",
   "description": "Your nutrition and training tracker",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#F3F6FA",
   "theme_color": "#173653",
   "orientation": "portrait",
-  "icons": []
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
 }
