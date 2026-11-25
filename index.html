@@ -204,5 +204,13 @@ function render() {
 
 render();
 </script>
+ <script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .catch(error => console.log('Service worker failed:', error));
+  });
+}
+ </script>
 </body>
 </html>
