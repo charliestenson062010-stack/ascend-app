@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#173653">
+<title>ASCEND</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:#f3f6fa;
+ color:#173653;
+ font-family:Arial,sans-serif;
+ padding-bottom:80px;
+}
+header{
+ background:white;
+ padding:24px 20px;
+ border-bottom:1px solid #e5ebf1;
+}
+.logo{font-size:28px;font-weight:900;letter-spacing:3px}
+.tagline{font-size:10px;letter-spacing:2px;color:#3684c5}
+main{padding:20px;max-width:650px;margin:auto}
+h2{font-size:23px}
+.card{
+ background:white;
+ border-radius:16px;
+ padding:18px;
+ margin-bottom:15px;
+ box-shadow:0 3px 14px #1736530b;
+}
+button{
+ border:0;
+ background:#3684c5;
+ color:white;
+ padding:12px 16px;
+ border-radius:10px;
+ font-weight:bold;
+}
+input,textarea{
+ width:100%;
+ padding:12px;
+ border:1px solid #dce5ed;
+ border-radius:9px;
+ margin:7px 0 13px;
+ font:inherit;
+}
+textarea{min-height:90px}
+.page{display:none}
+.page.active{display:block}
+nav{
+ position:fixed;
+ bottom:0;
+ left:0;
+ right:0;
+ background:white;
+ display:flex;
+ justify-content:space-around;
+ padding:12px 3px;
+ border-top:1px solid #e5ebf1;
+}
+nav button{background:white;color:#718096}
+nav button.active{color:#3684c5}
+.entry{padding:10px 0;border-bottom:1px solid #edf1f5}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">ASCEND</div>
+<div class="tagline">PERFORMANCE, REDEFINED.</div>
+</header>
+
+<main>
+<section id="home" class="page active">
+<h2>Welcome back.</h2>
+<p>Your performance starts here.</p>
+<div class="card">
+<h3>Today's overview</h3>
+<p id="foodCount">0 food entries</p>
+<p id="sessionCount">0 training sessions</p>
+</div>
+<div class="card">
+<h3>Your day</h3>
+<button onclick="showPage('food')">Log food</button>
+<button onclick="showPage('training')">Plan training</button>
+</div>
+</section>
+
+<section id="food" class="page">
+<h2>Food diary</h2>
+<div class="card">
+<h3>Add food</h3>
+<label>Food name</label>
+<input id="foodName" placeholder="e.g. Chicken breast">
+<label>Amount (g or ml)</label>
+<input id="foodAmount" type="number" placeholder="e.g. 150">
+<label>Meal</label>
+<input id="foodMeal" placeholder="Breakfast, lunch, dinner or snack">
+<button onclick="addFood()">Add food</button>
+</div>
+<div class="card">
+<h3>Today's food</h3>
+<div id="foodList">No food added yet.</div>
+</div>
+</section>
+
+<section id="training" class="page">
+<h2>Training planner</h2>
+<div class="card">
+<h3>Add a session</h3>
+<label>Session name</label>
+<input id="sessionName" placeholder="e.g. Monday boxing">
+<label>Workout details</label>
+<textarea id="sessionDetails" placeholder="Exercises, sets, reps and notes"></textarea>
+<button onclick="addSession()">Save session</button>
+</div>
+<div class="card">
+<h3>Your sessions</h3>
+<div id="sessionList">No sessions planned yet.</div>
+</div>
+</section>
+
+<section id="progress" class="page">
+<h2>Your progress</h2>
+<div class="card">
+<h3>Training sessions logged</h3>
+<strong id="progressCount">0</strong>
+<p>Sessions saved in your planner</p>
+</div>
+</section>
+</main>
+
+<nav>
+<button class="active" onclick="showPage('home',this)">Home</button>
+<button onclick="showPage('food',this)">Food</button>
+<button onclick="showPage('training',this)">Training</button>
+<button onclick="showPage('progress',this)">Progress</button>
+</nav>
+<script>
+let foods = JSON.parse(localStorage.getItem('ascendFoods') || '[]');
+let sessions = JSON.parse(localStorage.getItem('ascendSessions') || '[]');
+
+function showPage(id, button) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  if (button) button.classList.add('active');
+  else document.querySelectorAll('nav button')[['home','food','training','progress'].indexOf(id)].classList.add('active');
+}
+
+function addFood() {
+  let name = document.getElementById('foodName').value.trim();
+  let amount = document.getElementById('foodAmount').value;
+  let meal = document.getElementById('foodMeal').value.trim();
+  if (!name || !amount) {
+    alert('Please enter a food and amount.');
+    return;
+  }
+  foods.push({name, amount, meal});
+  localStorage.setItem('ascendFoods', JSON.stringify(foods));
+  document.getElementById('foodName').value = '';
+  document.getElementById('foodAmount').value = '';
+  document.getElementById('foodMeal').value = '';
+  render();
+}
+
+function addSession() {
+  let name = document.getElementById('sessionName').value.trim();
+  let details = document.getElementById('sessionDetails').value.trim();
+  if (!name) {
+    alert('Please enter a session name.');
+    return;
+  }
+  sessions.push({name, details});
+  localStorage.setItem('ascendSessions', JSON.stringify(sessions));
+  document.getElementById('sessionName').value = '';
+  document.getElementById('sessionDetails').value = '';
+  render();
+}
+
+function escapeText(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;',
+    '"':'&quot;', "'":'&#39;'
+  })[char]);
+}
+
+function render() {
+  document.getElementById('foodCount').textContent = foods.length + ' food entries';
+  document.getElementById('sessionCount').textContent = sessions.length + ' training sessions';
+  document.getElementById('progressCount').textContent = sessions.length;
+
+  document.getElementById('foodList').innerHTML = foods.length
+    ? foods.map(f => '<div class="entry"><b>' + escapeText(f.name) + '</b> — ' + escapeText(f.amount) + ' g/ml<br><small>' + escapeText(f.meal) + '</small></div>').join('')
+    : 'No food added yet.';
+
+  document.getElementById('sessionList').innerHTML = sessions.length
+    ? sessions.map(s => '<div class="entry"><b>' + escapeText(s.name) + '</b><br>' + escapeText(s.details) + '</div>').join('')
+    : 'No sessions planned yet.';
+}
+
+render();
+</script>
+</body>
+</html>
