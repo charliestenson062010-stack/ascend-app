@@ -3,7 +3,7 @@ const CACHE_NAME = 'ascend-v1';
 const FILES_TO_CACHE = [
   './',
   './index.html',
-  './manifest.json'
+  './Manifest.json'
 ];
 
 self.addEventListener('install', event => {
